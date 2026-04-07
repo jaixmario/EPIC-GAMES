@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Games Tracker</title>
+  <meta name="description" content="Track current Epic Games and Steam freebies from JSON data published in this repository.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body class="site-shell">
+  <div class="page-glow page-glow-a"></div>
+  <div class="page-glow page-glow-b"></div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Free Games Tracker</a>
+    <nav class="nav">
+      <a class="nav-link active" href="index.html">Games</a>
+      <a class="nav-link" href="docs.html">Docs</a>
+      <a class="nav-link" href="README.md">README</a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">GitHub Pages Dashboard</p>
+        <h1>Free games, cleanly surfaced from your JSON snapshots.</h1>
+        <p class="hero-text">
+          This page reads <code>free.json</code> and <code>free-steam.json</code> directly from the repository
+          and turns them into a live storefront-style board for Epic Games and Steam offers.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#games-board">View Games</a>
+          <a class="button button-secondary" href="docs.html">Open Docs</a>
+        </div>
+      </div>
+
+      <aside class="status-panel">
+        <p class="status-label">Data Sources</p>
+        <div class="status-list">
+          <div class="status-item">
+            <span>Epic</span>
+            <strong id="epic-updated-at">Loading...</strong>
+          </div>
+          <div class="status-item">
+            <span>Steam</span>
+            <strong id="steam-updated-at">Loading...</strong>
+          </div>
+        </div>
+        <p class="status-footnote">Updated by your existing GitHub Actions workflow.</p>
+      </aside>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-card accent-epic">
+        <p class="summary-label">Epic Current</p>
+        <h2 id="epic-current-count">0</h2>
+        <p class="summary-note">Claimable right now</p>
+      </article>
+      <article class="summary-card accent-upcoming">
+        <p class="summary-label">Epic Upcoming</p>
+        <h2 id="epic-upcoming-count">0</h2>
+        <p class="summary-note">Next revealed offers</p>
+      </article>
+      <article class="summary-card accent-steam">
+        <p class="summary-label">Steam Offers</p>
+        <h2 id="steam-count">0</h2>
+        <p class="summary-note">Free to keep and weekends</p>
+      </article>
+    </section>
+
+    <section class="games-board" id="games-board">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Current Data</p>
+          <h2>Games Board</h2>
+        </div>
+      </div>
+
+      <div class="board-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Epic Games Free Now</h3>
+            <span class="pill pill-epic">Epic</span>
+          </div>
+          <div id="epic-current-list" class="card-stack">
+            <p class="empty-state">Loading Epic current offers...</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Epic Games Upcoming</h3>
+            <span class="pill pill-upcoming">Soon</span>
+          </div>
+          <div id="epic-upcoming-list" class="card-stack">
+            <p class="empty-state">Loading Epic upcoming offers...</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel steam-panel">
+        <div class="panel-head">
+          <h3>Steam Free Offers</h3>
+          <span class="pill pill-steam">Steam</span>
+        </div>
+        <div id="steam-list" class="card-stack steam-grid">
+          <p class="empty-state">Loading Steam offers...</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built from repository JSON snapshots for GitHub Pages.</p>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>

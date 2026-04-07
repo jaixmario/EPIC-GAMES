@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Docs | Free Games Tracker</title>
+  <meta name="description" content="Project documentation for the Free Games Auto Notifier and GitHub Pages site.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body class="site-shell docs-shell">
+  <div class="page-glow page-glow-a"></div>
+  <div class="page-glow page-glow-b"></div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Free Games Tracker</a>
+    <nav class="nav">
+      <a class="nav-link" href="index.html">Games</a>
+      <a class="nav-link active" href="docs.html">Docs</a>
+      <a class="nav-link" href="README.md">README</a>
+    </nav>
+  </header>
+
+  <main class="layout docs-layout">
+    <section class="hero docs-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">A to Z Guide</p>
+        <h1>How this project works, from data collection to GitHub Pages.</h1>
+        <p class="hero-text">
+          This page documents the project architecture, scripts, workflow, data files, and deployment path
+          so anyone opening the repository can understand the full system quickly.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-grid">
+      <aside class="toc-panel">
+        <h2>On This Page</h2>
+        <a href="#overview">Overview</a>
+        <a href="#flow">System Flow</a>
+        <a href="#files">Main Files</a>
+        <a href="#json">JSON Data</a>
+        <a href="#automation">Automation</a>
+        <a href="#pages">GitHub Pages</a>
+        <a href="#setup">Setup</a>
+        <a href="#extend">How to Extend</a>
+      </aside>
+
+      <div class="docs-content">
+        <section class="doc-block" id="overview">
+          <p class="eyebrow">Overview</p>
+          <h2>What this project does</h2>
+          <p>
+            The project tracks free game promotions from Epic Games and Steam, stores structured JSON snapshots,
+            sends HTML email alerts when lineups change, updates the README automatically, and exposes the latest
+            offers through this GitHub Pages site.
+          </p>
+        </section>
+
+        <section class="doc-block" id="flow">
+          <p class="eyebrow">System Flow</p>
+          <h2>End-to-end flow</h2>
+          <div class="timeline">
+            <div class="timeline-item">
+              <strong>1. Fetch</strong>
+              <p>`epic.PY` calls Epic's promotion endpoint and `steam.py` gathers Steam deals from web/API sources.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>2. Normalize</strong>
+              <p>Each script converts the results into predictable JSON records with title, link, image, type, and timing fields.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>3. Detect changes</strong>
+              <p>A signature is built from the offer list so emails only send when the lineup actually changes.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>4. Persist</strong>
+              <p>The latest state is saved into `free.json` and `free-steam.json` for downstream consumers.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>5. Publish</strong>
+              <p>`generate_readme.py` refreshes the README while GitHub Pages serves the JSON-backed website.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-block" id="files">
+          <p class="eyebrow">Repository</p>
+          <h2>Main files</h2>
+          <div class="info-table">
+            <div class="info-row"><span>`epic.PY`</span><strong>Epic fetcher, email sender, JSON state writer.</strong></div>
+            <div class="info-row"><span>`steam.py`</span><strong>Steam fetcher, weekend title resolver, JSON state writer.</strong></div>
+            <div class="info-row"><span>`generate_readme.py`</span><strong>README auto-section generator.</strong></div>
+            <div class="info-row"><span>`free.json`</span><strong>Epic current and upcoming free game snapshot.</strong></div>
+            <div class="info-row"><span>`free-steam.json`</span><strong>Steam free-offer snapshot.</strong></div>
+            <div class="info-row"><span>`index.html`</span><strong>GitHub Pages homepage for game browsing.</strong></div>
+            <div class="info-row"><span>`docs.html`</span><strong>Full documentation page.</strong></div>
+          </div>
+        </section>
+
+        <section class="doc-block" id="json">
+          <p class="eyebrow">Data</p>
+          <h2>JSON structure</h2>
+          <p>The site expects these repository files:</p>
+          <div class="code-card">
+            <pre><code>free.json
+{
+  "signature": "...",
+  "updated_at": "...",
+  "current_games": [{ "title": "", "link": "", "image": "", "start": "", "end": "" }],
+  "upcoming_games": [{ "title": "", "link": "", "image": "", "start": "", "end": "" }]
+}
+
+free-steam.json
+{
+  "signature": "...",
+  "updated_at": "...",
+  "games": [{ "type": "", "title": "", "link": "", "image": "", "time": "" }]
+}</code></pre>
+          </div>
+        </section>
+
+        <section class="doc-block" id="automation">
+          <p class="eyebrow">Automation</p>
+          <h2>GitHub Actions</h2>
+          <p>
+            The workflow runs every 6 hours and can also be triggered manually. It installs dependencies,
+            runs both fetcher scripts, regenerates the README, and commits updated JSON snapshots.
+          </p>
+        </section>
+
+        <section class="doc-block" id="pages">
+          <p class="eyebrow">Deployment</p>
+          <h2>GitHub Pages setup</h2>
+          <p>
+            To publish the site, enable GitHub Pages in the repository settings and choose the branch that
+            contains this root directory. Because the site is static and reads local JSON files, no frontend build
+            step is required.
+          </p>
+          <p>
+            Once Pages is enabled, `index.html` becomes the homepage and `docs.html` becomes the linked
+            documentation page.
+          </p>
+        </section>
+
+        <section class="doc-block" id="setup">
+          <p class="eyebrow">Setup</p>
+          <h2>How to run locally</h2>
+          <div class="code-card">
+            <pre><code>pip install requests beautifulsoup4
+
+$env:EMAIL="you@example.com"
+$env:PASSWORD="your-app-password"
+$env:TO_EMAIL="recipient@example.com"
+
+python epic.PY
+python steam.py
+python generate_readme.py</code></pre>
+          </div>
+        </section>
+
+        <section class="doc-block" id="extend">
+          <p class="eyebrow">Extend</p>
+          <h2>How to grow the project</h2>
+          <p>
+            You can add more storefronts by following the same pattern: fetch data, normalize it into JSON,
+            generate a signature, save a state file, and teach the site how to render the new data source.
+          </p>
+          <p>
+            Good next additions would be GOG, Humble promotions, a platform filter, or a historical archive page.
+          </p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Documentation page for the Free Games Auto Notifier project.</p>
+  </footer>
+</body>
+</html>
