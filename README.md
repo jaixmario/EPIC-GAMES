@@ -10,7 +10,7 @@ Automatically tracks Epic Games and Steam free game offers, sends HTML email and
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
-Last updated: **07 Apr 2026, 06:44 PM IST**  
+Last updated: **07 Apr 2026, 09:07 PM IST**  
 Source: Epic fallback from saved state, Steam live data
 
 ### Epic Games
