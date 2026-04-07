@@ -1,6 +1,6 @@
 # Free Games Auto Notifier
 
-Automatically tracks Epic Games and Steam free game offers, sends HTML email alerts, and keeps this README updated with the latest free games on every workflow run.
+Automatically tracks Epic Games and Steam free game offers, sends HTML email and Telegram alerts, and keeps this README updated with the latest free games on every workflow run.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Automated-success?logo=github-actions&logoColor=white)
@@ -30,7 +30,7 @@ Source: Epic fallback from saved state, Steam live data
 
 - Epic Games support for current and upcoming free promotions
 - Steam support for free-to-keep deals and free weekend events
-- HTML email notifications with images, dates, and direct links
+- HTML email and Telegram notifications
 - Change detection to avoid duplicate emails
 - Automatic README refresh on every scheduled workflow run
 - GitHub Actions automation every 6 hours
@@ -76,9 +76,11 @@ Create these repository secrets in `Settings -> Secrets and variables -> Actions
 |-------------|-------------|
 | `EMAIL` | Sender Gmail address |
 | `PASSWORD` | Gmail App Password |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token from BotFather |
+| `TELEGRAM_CHAT_ID` | Telegram user, group, or channel chat id |
 | `TO_EMAIL` | Recipient email address |
 
-Use a Gmail App Password, not your normal account password.
+Use a Gmail App Password, not your normal account password. Telegram is optional, but if you set both Telegram secrets the workflow will send bot messages too.
 
 ---
 
@@ -90,14 +92,14 @@ Use a Gmail App Password, not your normal account password.
 2. Extracts current and upcoming free games.
 3. Formats dates in IST.
 4. Compares the latest titles with `free.txt`.
-5. Sends an email only when the lineup changes.
+5. Sends email and optional Telegram alerts only when the lineup changes.
 
 ### `steam.py`
 
 1. Scrapes Steam search results for discounted free offers.
 2. Checks Steam featured categories for free weekend events.
 3. Compares the latest titles with `free-steam.txt`.
-4. Sends an email only when the lineup changes.
+4. Sends email and optional Telegram alerts only when the lineup changes.
 
 ### `generate_readme.py`
 
@@ -129,6 +131,8 @@ Each run:
 ```powershell
 $env:EMAIL="you@gmail.com"
 $env:PASSWORD="your-app-password"
+$env:TELEGRAM_BOT_TOKEN="123456:telegram-bot-token"
+$env:TELEGRAM_CHAT_ID="123456789"
 $env:TO_EMAIL="recipient@example.com"
 
 python epic.PY

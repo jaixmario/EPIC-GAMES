@@ -14,11 +14,13 @@ SMTP_PORT = 587
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 TO_EMAIL = os.getenv("TO_EMAIL")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 STATE_FILE = "free-steam.json"
 LEGACY_STATE_FILE = "free-steam.txt"
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
-
+ 
 
 def clean_text(value):
     return re.sub(r"\s+", " ", (value or "")).strip()
@@ -221,6 +223,9 @@ def build_html(games):
 
 
 def send_email(subject, html):
+    if not EMAIL or not PASSWORD or not TO_EMAIL:
+        return
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = EMAIL
@@ -233,6 +238,40 @@ def send_email(subject, html):
         server.send_message(msg)
 
 
+def build_telegram_message(games):
+    lines = ["Steam Free Games Update", ""]
+
+    if not games:
+        lines.append("No Steam offers found.")
+        return "\n".join(lines)
+
+    for game in games:
+        lines.append(f"- {game['title']} ({game['type']})")
+        if game.get("time"):
+            lines.append(f"  {game['time']}")
+        if game.get("link"):
+            lines.append(f"  {game['link']}")
+
+    return "\n".join(lines)
+
+
+def send_telegram_message(message):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    response = requests.post(
+        url,
+        json={
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message,
+            "disable_web_page_preview": False,
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
+
+
 if __name__ == "__main__":
     games = fetch_games()
     signature = generate_signature(games)
@@ -243,6 +282,8 @@ if __name__ == "__main__":
         print("New Steam update detected.")
         subject = "Steam Free Games Update"
         html = build_html(games)
+        telegram_message = build_telegram_message(games)
         send_email(subject, html)
+        send_telegram_message(telegram_message)
         save_state(signature, games)
-        print("Email sent and JSON state saved.")
+        print("Notifications sent and JSON state saved.")
