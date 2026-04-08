@@ -1,6 +1,6 @@
 # Free Games Auto Notifier
 
-Automatically tracks Epic Games and Steam free game offers, sends HTML email and Telegram alerts, and keeps this README updated with the latest free games on every workflow run.
+> Automatically tracks **Epic Games** and **Steam** free game offers and sends you a beautiful HTML email notification whenever new free games appear — powered by GitHub Actions.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Automated-success?logo=github-actions&logoColor=white)
