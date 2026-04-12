@@ -12,7 +12,7 @@
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
-Last updated: **12 Apr 2026, 03:55 PM IST**  
+Last updated: **12 Apr 2026, 06:27 PM IST**  
 Source: Epic fallback from saved state, Steam live data
 
 ### Epic Games
