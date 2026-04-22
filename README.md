@@ -12,7 +12,7 @@
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
-Last updated: **22 Apr 2026, 06:51 PM IST**  
+Last updated: **23 Apr 2026, 12:39 AM IST**  
 Source: Epic fallback from saved state, Steam live data
 
 ### Epic Games
@@ -25,6 +25,7 @@ Source: Epic fallback from saved state, Steam live data
 - **Cthulhu: The Cosmic Abyss - Sanity Skin Pack** - Free to Keep ([Open](https://store.steampowered.com/app/4277070/Cthulhu_The_Cosmic_Abyss__Sanity_Skin_Pack/?snr=1_7_7_2300_150_1))
 - **Legend of Keepers: Career of a Dungeon Manager** - Free to Keep ([Open](https://store.steampowered.com/app/978520/Legend_of_Keepers_Career_of_a_Dungeon_Manager/?snr=1_7_7_2300_150_1))
 - **Sentience: The Android's Tale** - Free to Keep ([Open](https://store.steampowered.com/app/635850/Sentience_The_Androids_Tale/?snr=1_7_7_2300_150_1))
+- **SurrounDead Poly Construction** - Free to Keep ([Open](https://store.steampowered.com/app/4148570/SurrounDead_Poly_Construction/?snr=1_7_7_2300_150_1))
 <!-- README_AUTO_SECTION:END -->
 
 ---
