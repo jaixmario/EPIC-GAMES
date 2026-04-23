@@ -12,7 +12,7 @@
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
-Last updated: **23 Apr 2026, 01:17 PM IST**  
+Last updated: **23 Apr 2026, 06:53 PM IST**  
 Source: Epic fallback from saved state, Steam live data
 
 ### Epic Games
@@ -20,6 +20,7 @@ Source: Epic fallback from saved state, Steam live data
 
 ### Upcoming on Epic
 - **DOOMBLADE** - starts `23 Apr 2026, 08:30 PM IST` ([Store page](https://store.epicgames.com/en-US/p/doomblade-afdf9a))
+- **Firestone Online Idle RPG** - starts `30 Apr 2026, 08:30 PM IST` ([Store page](https://store.epicgames.com/en-US/p/firestone-online-idle-rpg-bfd04b))
 
 ### Steam
 - **Aeonic** - Free to Keep ([Open](https://store.steampowered.com/app/3277530/Aeonic/?snr=1_7_7_2300_150_1))
