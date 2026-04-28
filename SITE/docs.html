@@ -67,7 +67,7 @@
           <h2>What this project does</h2>
           <p>
             The project tracks free game promotions from Epic Games and Steam, stores structured JSON snapshots,
-            sends notifications through email, Telegram, and Discord when lineups change, updates the README automatically, and exposes the latest
+            sends notifications through email, Telegram, Discord, and WhatsApp when lineups change, updates the README automatically, and exposes the latest
             offers through this GitHub Pages site.
           </p>
         </section>
@@ -86,14 +86,18 @@
             </div>
             <div class="timeline-item">
               <strong>3. Detect changes</strong>
-              <p>A signature is built from the offer list so emails only send when the lineup actually changes.</p>
+              <p>A signature is built from the offer list so notifications only send when the lineup actually changes.</p>
             </div>
             <div class="timeline-item">
               <strong>4. Persist</strong>
               <p>The latest state is saved into `free.json` and `free-steam.json` for downstream consumers.</p>
             </div>
             <div class="timeline-item">
-              <strong>5. Publish</strong>
+              <strong>5. Notify</strong>
+              <p>The scripts deliver channel-specific messages for email, Telegram, Discord, and WhatsApp, including image-based WhatsApp updates when artwork is available.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>6. Publish</strong>
               <p>`generate_readme.py` refreshes the README while GitHub Pages serves the JSON-backed website, and `start.py` runs both notifiers locally in sequence.</p>
             </div>
           </div>
@@ -103,10 +107,11 @@
           <p class="eyebrow">Repository</p>
           <h2>Main files</h2>
           <div class="info-table">
-            <div class="info-row"><span>`epic.PY`</span><strong>Epic fetcher, email sender, JSON state writer.</strong></div>
-            <div class="info-row"><span>`steam.py`</span><strong>Steam fetcher, weekend title resolver, JSON state writer.</strong></div>
+            <div class="info-row"><span>`epic.PY`</span><strong>Epic fetcher, multi-channel notifier, JSON state writer.</strong></div>
+            <div class="info-row"><span>`steam.py`</span><strong>Steam fetcher, weekend title resolver, multi-channel notifier.</strong></div>
             <div class="info-row"><span>`start.py`</span><strong>Runs `epic.PY` and `steam.py` one after another.</strong></div>
             <div class="info-row"><span>`generate_readme.py`</span><strong>README auto-section generator.</strong></div>
+            <div class="info-row"><span>`whatsapp.py`</span><strong>Shared WhatsApp Cloud API helper for text and image messages.</strong></div>
             <div class="info-row"><span>`config.json`</span><strong>Notification toggles and secrets-file settings.</strong></div>
             <div class="info-row"><span>`secrets.json`</span><strong>Optional local JSON secrets source.</strong></div>
             <div class="info-row"><span>`free.json`</span><strong>Epic current and upcoming free game snapshot.</strong></div>
@@ -142,27 +147,29 @@ free-steam.json
           <p class="eyebrow">Delivery</p>
           <h2>Notification channels</h2>
           <p>
-            The project can notify through email, Telegram, and Discord. Each channel can be enabled or disabled
+            The project can notify through email, Telegram, Discord, and WhatsApp. Each channel can be enabled or disabled
             independently inside <code>config.json</code>.
           </p>
           <div class="code-card">
             <pre class="code-window"><code class="language-json">{
   "secrets": {
-    "use_hardcoded_secrets": false,
+    "use_hardcoded_secrets": true,
     "secrets_file": "secrets.json"
   },
   "notifications": {
-    "email": true,
-    "telegram": true,
-    "discord": true
+    "email": false,
+    "telegram": false,
+    "discord": false,
+    "whatsapp": true
   }
 }</code></pre>
           </div>
           <p>
-            Email, Telegram, and Discord all support multiple targets separated by commas. Email supports up to
+            Email, Telegram, Discord, and WhatsApp all support multiple targets separated by commas. Email supports up to
             30 recipients per run, for example <code>first@example.com,second@example.com</code>. Telegram and
             Discord support comma-separated chat or channel IDs like <code>-1003918180986,1845799450</code> and
-            <code>123456789012345678,987654321098765432</code>.
+            <code>123456789012345678,987654321098765432</code>. WhatsApp recipients use international numbers such as
+            <code>919989148967,14155552671</code>.
           </p>
           <div class="code-card">
             <pre class="code-window"><code class="language-json">{
@@ -178,9 +185,19 @@ free-steam.json
   "discord": {
     "bot_token": "YOUR_DISCORD_BOT_TOKEN",
     "channel_id": "123456789012345678,987654321098765432"
+  },
+  "whatsapp": {
+    "access_token": "EAAG...",
+    "phone_number_id": "1126873913833051",
+    "to": "919989148967,14155552671",
+    "api_version": "v25.0"
   }
 }</code></pre>
           </div>
+          <p>
+            WhatsApp currently sends one summary text followed by one message per game. If a game includes artwork,
+            the notifier sends an image message with a caption and store link. If no image is available, it falls back to plain text with a tappable URL preview.
+          </p>
         </section>
 
         <section class="doc-block" id="automation">
@@ -208,17 +225,18 @@ free-steam.json
           <div class="code-card">
             <pre class="code-window"><code class="language-powershell">pip install requests beautifulsoup4
 
-$env:EMAIL="you@example.com"
-$env:PASSWORD="your-app-password"
-$env:TO_EMAIL="first@example.com,second@example.com"
-$env:TELEGRAM_BOT_TOKEN="123456:telegram-bot-token"
-$env:TELEGRAM_CHAT_ID="-1003918180986,1845799450"
-$env:DISCORD_BOT_TOKEN="your-discord-bot-token"
-$env:DISCORD_CHANNEL_ID="123456789012345678,987654321098765432"
+$env:WHATSAPP_ACCESS_TOKEN="EAAG..."
+$env:WHATSAPP_PHONE_NUMBER_ID="1126873913833051"
+$env:WHATSAPP_TO="919989148967"
+$env:WHATSAPP_API_VERSION="v25.0"
 
 python start.py
 python generate_readme.py</code></pre>
           </div>
+          <p>
+            For local runs, you can either set environment variables like the example above or keep
+            <code>use_hardcoded_secrets</code> enabled and place the same values in <code>secrets.json</code>.
+          </p>
         </section>
 
         <section class="doc-block" id="extend">

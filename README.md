@@ -8,6 +8,7 @@
 ![Schedule](https://img.shields.io/badge/Runs%20Every-6%20Hours-orange?logo=clockify&logoColor=white)
 ![Telegram](https://img.shields.io/badge/Telegram-Bot-26A5E4?logo=telegram&logoColor=white)
 ![Discord](https://img.shields.io/badge/Discord-Bot-5865F2?logo=discord&logoColor=white)
+![WhatsApp](https://img.shields.io/badge/WhatsApp-Cloud%20API-25D366?logo=whatsapp&logoColor=white)
 
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
@@ -38,6 +39,7 @@ Source: Epic fallback from saved state, Steam live data
 - HTML email notifications
 - Telegram bot notifications with per-game photo cards
 - **Discord bot notifications with rich embeds** (title, image, dates, store link)
+- **WhatsApp Cloud API notifications** with summary and per-game text messages
 - Change detection to avoid duplicate notifications
 - Automatic README refresh on every scheduled workflow run
 - GitHub Actions automation every 6 hours
@@ -96,6 +98,10 @@ Create these repository secrets in `Settings -> Secrets and variables -> Actions
 | `TELEGRAM_CHAT_ID` | Telegram chat ID or comma-separated chat IDs |
 | `DISCORD_BOT_TOKEN` | Discord bot token from the Developer Portal |
 | `DISCORD_CHANNEL_ID` | Discord channel ID or comma-separated channel IDs |
+| `WHATSAPP_ACCESS_TOKEN` | Meta WhatsApp Cloud API bearer token |
+| `WHATSAPP_PHONE_NUMBER_ID` | WhatsApp Cloud API phone number ID |
+| `WHATSAPP_TO` | Recipient number or comma-separated numbers in international format |
+| `WHATSAPP_API_VERSION` | Optional Graph API version such as `v25.0` |
 
 Use a Gmail App Password, not your normal account password. Each notification type is independent — you can enable only the ones you need via `config.json`.
 
@@ -110,7 +116,8 @@ Use a Gmail App Password, not your normal account password. Each notification ty
   "notifications": {
     "email": true,
     "telegram": true,
-    "discord": true
+    "discord": true,
+    "whatsapp": false
   }
 }
 ```
@@ -146,11 +153,17 @@ Then fill `secrets.json` with your local values:
   "discord": {
     "bot_token": "YOUR_DISCORD_BOT_TOKEN",
     "channel_id": "YOUR_CHANNEL_ID"
+  },
+  "whatsapp": {
+    "access_token": "EAAG...",
+    "phone_number_id": "1126873913833051",
+    "to": "919989148967",
+    "api_version": "v25.0"
   }
 }
 ```
 
-Email, Telegram, and Discord all support multiple targets separated by commas. Email delivery is capped at 30 recipients per run.
+Email, Telegram, Discord, and WhatsApp all support multiple targets separated by commas. Email delivery is capped at 30 recipients per run.
 
 ---
 
@@ -162,14 +175,14 @@ Email, Telegram, and Discord all support multiple targets separated by commas. E
 2. Extracts current and upcoming free games.
 3. Formats dates in IST.
 4. Compares the latest JSON snapshot with `free.json`.
-5. Sends email, Telegram, and/or Discord alerts only when the lineup changes.
+5. Sends email, Telegram, Discord, and/or WhatsApp alerts only when the lineup changes.
 
 ### `steam.py`
 
 1. Scrapes Steam search results for discounted free offers.
 2. Checks Steam featured categories for free weekend events.
 3. Compares the latest JSON snapshot with `free-steam.json`.
-4. Sends email, Telegram, and/or Discord alerts only when the lineup changes.
+4. Sends email, Telegram, Discord, and/or WhatsApp alerts only when the lineup changes.
 
 #### Discord notifications
 
@@ -185,6 +198,16 @@ Both scripts send Telegram updates using the Bot API. Each run sends:
 - A short **summary message**.
 - One **formatted message or photo card per game** with clickable links.
 - Delivery to one or many chats when `chat_id` contains comma-separated values.
+
+#### WhatsApp notifications
+
+Both scripts send WhatsApp updates through the Meta Cloud API. Each run sends:
+
+- A short **summary message**.
+- One **plain-text message per game** with details and a store link.
+- Delivery to one or many recipients when `WHATSAPP_TO` contains comma-separated values.
+
+Free-form text messages work inside WhatsApp's customer service window. For messages outside that window, Meta requires approved templates.
 
 ### `generate_readme.py`
 
@@ -229,6 +252,10 @@ $env:TELEGRAM_BOT_TOKEN="123456:telegram-bot-token"
 $env:TELEGRAM_CHAT_ID="123456789"
 $env:DISCORD_BOT_TOKEN="your-discord-bot-token"
 $env:DISCORD_CHANNEL_ID="your-channel-id"
+$env:WHATSAPP_ACCESS_TOKEN="EAAG..."
+$env:WHATSAPP_PHONE_NUMBER_ID="1126873913833051"
+$env:WHATSAPP_TO="919989148967"
+$env:WHATSAPP_API_VERSION="v25.0"
 
 python start.py
 python generate_readme.py

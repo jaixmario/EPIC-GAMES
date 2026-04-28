@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from html import escape
 
 import requests
+from whatsapp import send_whatsapp_image, send_whatsapp_text
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -26,6 +27,7 @@ def load_config():
             "email": True,
             "telegram": True,
             "discord": True,
+            "whatsapp": False,
         }
     }
 
@@ -49,6 +51,7 @@ def load_config():
             "email": bool(notifications.get("email", True)),
             "telegram": bool(notifications.get("telegram", True)),
             "discord": bool(notifications.get("discord", True)),
+            "whatsapp": bool(notifications.get("whatsapp", False)),
         }
     }
 
@@ -68,6 +71,7 @@ def load_secrets():
         email_data = data.get("email", {})
         telegram_data = data.get("telegram", {})
         discord_data = data.get("discord", {})
+        whatsapp_data = data.get("whatsapp", {})
         return {
             "EMAIL": str(email_data.get("email", "")),
             "PASSWORD": str(email_data.get("password", "")),
@@ -76,6 +80,10 @@ def load_secrets():
             "TELEGRAM_CHAT_ID": str(telegram_data.get("chat_id", "")),
             "DISCORD_BOT_TOKEN": str(discord_data.get("bot_token", "")),
             "DISCORD_CHANNEL_ID": str(discord_data.get("channel_id", "")),
+            "WHATSAPP_ACCESS_TOKEN": str(whatsapp_data.get("access_token", "")),
+            "WHATSAPP_PHONE_NUMBER_ID": str(whatsapp_data.get("phone_number_id", "")),
+            "WHATSAPP_TO": str(whatsapp_data.get("to", "")),
+            "WHATSAPP_API_VERSION": str(whatsapp_data.get("api_version", "v25.0")),
         }
 
     return {
@@ -86,6 +94,10 @@ def load_secrets():
         "TELEGRAM_CHAT_ID": os.getenv("TELEGRAM_CHAT_ID", ""),
         "DISCORD_BOT_TOKEN": os.getenv("DISCORD_BOT_TOKEN", ""),
         "DISCORD_CHANNEL_ID": os.getenv("DISCORD_CHANNEL_ID", ""),
+        "WHATSAPP_ACCESS_TOKEN": os.getenv("WHATSAPP_ACCESS_TOKEN", ""),
+        "WHATSAPP_PHONE_NUMBER_ID": os.getenv("WHATSAPP_PHONE_NUMBER_ID", ""),
+        "WHATSAPP_TO": os.getenv("WHATSAPP_TO", ""),
+        "WHATSAPP_API_VERSION": os.getenv("WHATSAPP_API_VERSION", "v25.0"),
     }
 
 
@@ -97,6 +109,10 @@ TELEGRAM_BOT_TOKEN = SECRETS["TELEGRAM_BOT_TOKEN"]
 TELEGRAM_CHAT_ID = SECRETS["TELEGRAM_CHAT_ID"]
 DISCORD_BOT_TOKEN = SECRETS["DISCORD_BOT_TOKEN"]
 DISCORD_CHANNEL_ID = SECRETS["DISCORD_CHANNEL_ID"]
+WHATSAPP_ACCESS_TOKEN = SECRETS["WHATSAPP_ACCESS_TOKEN"]
+WHATSAPP_PHONE_NUMBER_ID = SECRETS["WHATSAPP_PHONE_NUMBER_ID"]
+WHATSAPP_TO = SECRETS["WHATSAPP_TO"]
+WHATSAPP_API_VERSION = SECRETS["WHATSAPP_API_VERSION"]
 
 
 def parse_csv_values(value):
@@ -471,6 +487,85 @@ def send_discord_notifications(current_games, upcoming_games):
         _discord_post({"embeds": [embed]})
 
 
+def build_whatsapp_summary(current_games, upcoming_games):
+    return "\n".join(
+        [
+            "Epic Free Games Update",
+            f"Free now: {len(current_games)}",
+            f"Upcoming: {len(upcoming_games)}",
+        ]
+    )
+
+
+def build_whatsapp_game_message(game, label):
+    return "\n".join(
+        [
+            label,
+            game["title"],
+            f"Start: {game.get('start', 'N/A')}",
+            f"End: {game.get('end', 'N/A')}",
+            f"Link: {game.get('link', 'https://store.epicgames.com/en-US/')}",
+        ]
+    )
+
+
+def send_whatsapp_game(recipient_data, game, label):
+    caption = build_whatsapp_game_message(game, label)
+    if game.get("image"):
+        return send_whatsapp_image(
+            recipient_data["access_token"],
+            recipient_data["phone_number_id"],
+            recipient_data["recipients"],
+            game["image"],
+            caption=caption,
+            api_version=recipient_data["api_version"],
+        )
+
+    return send_whatsapp_text(
+        recipient_data["access_token"],
+        recipient_data["phone_number_id"],
+        recipient_data["recipients"],
+        caption,
+        api_version=recipient_data["api_version"],
+        preview_url=True,
+    )
+
+
+def send_whatsapp_notifications(current_games, upcoming_games):
+    if not CONFIG["notifications"]["whatsapp"]:
+        print("WhatsApp disabled in config.")
+        return
+
+    recipients = parse_csv_values(WHATSAPP_TO)
+    if not WHATSAPP_ACCESS_TOKEN or not WHATSAPP_PHONE_NUMBER_ID or not recipients:
+        print("WhatsApp skipped: missing access token, phone number ID, or recipient.")
+        return
+
+    recipient_data = {
+        "access_token": WHATSAPP_ACCESS_TOKEN,
+        "phone_number_id": WHATSAPP_PHONE_NUMBER_ID,
+        "recipients": recipients,
+        "api_version": WHATSAPP_API_VERSION,
+    }
+
+    sent_count = send_whatsapp_text(
+        recipient_data["access_token"],
+        recipient_data["phone_number_id"],
+        recipient_data["recipients"],
+        build_whatsapp_summary(current_games, upcoming_games),
+        api_version=recipient_data["api_version"],
+    )
+    total_messages = sent_count
+
+    for game in current_games:
+        total_messages += send_whatsapp_game(recipient_data, game, "Epic Free Now")
+
+    for game in upcoming_games:
+        total_messages += send_whatsapp_game(recipient_data, game, "Epic Upcoming")
+
+    print(f"WhatsApp sent {total_messages} message(s) to {len(recipients)} recipient(s).")
+
+
 if __name__ == "__main__":
     current_games, upcoming_games = fetch_games()
     signature = generate_signature(current_games, upcoming_games)
@@ -486,5 +581,6 @@ if __name__ == "__main__":
         send_email(subject, html)
         send_telegram_notifications(current_games, upcoming_games)
         send_discord_notifications(current_games, upcoming_games)
+        send_whatsapp_notifications(current_games, upcoming_games)
         save_state(signature, current_games, upcoming_games)
         print("Notifications sent and JSON state saved.")

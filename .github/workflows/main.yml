@@ -33,6 +33,10 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+          WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+          WHATSAPP_TO: ${{ secrets.WHATSAPP_TO }}
+          WHATSAPP_API_VERSION: ${{ secrets.WHATSAPP_API_VERSION }}
         run: python epic.PY
 
       - name: Run Steam notifier
@@ -44,6 +48,10 @@ jobs:
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+          WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+          WHATSAPP_TO: ${{ secrets.WHATSAPP_TO }}
+          WHATSAPP_API_VERSION: ${{ secrets.WHATSAPP_API_VERSION }}
         run: python steam.py
 
       - name: Refresh README

@@ -6,6 +6,7 @@
   "notifications": {
     "email": true,
     "telegram": true,
-    "discord": true
+    "discord": true,
+    "whatsapp": true
   }
 }
