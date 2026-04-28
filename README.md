@@ -202,10 +202,11 @@ Both scripts send Telegram updates using the Bot API. Each run sends:
 Both scripts send WhatsApp updates through the Meta Cloud API. Each run sends:
 
 - A short **summary message**.
-- One **plain-text message per game** with details and a store link.
+- One **image message with caption and store link** when artwork is available, or a text fallback when it is not.
 - Delivery to one or many recipients when `WHATSAPP_TO` contains comma-separated values.
 
 Free-form text messages work inside WhatsApp's customer service window. For messages outside that window, Meta requires approved templates.
+GitHub Actions may have WhatsApp API requests blocked or fail unpredictably in some environments, so WhatsApp notifications are best run locally or from a VPS.
 
 ### `generate_readme.py`
 
@@ -216,6 +217,8 @@ Free-form text messages work inside WhatsApp's customer service window. For mess
 ---
 
 ## GitHub Actions Workflow
+
+Note: GitHub Actions is fine for scraping and README refreshes, but WhatsApp API delivery may be blocked there. Use WhatsApp notifications locally or on a VPS for more reliable sending.
 
 The workflow runs on:
 

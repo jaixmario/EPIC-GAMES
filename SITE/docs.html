@@ -198,6 +198,9 @@ free-steam.json
             WhatsApp currently sends one summary text followed by one message per game. If a game includes artwork,
             the notifier sends an image message with a caption and store link. If no image is available, it falls back to plain text with a tappable URL preview.
           </p>
+          <p>
+            GitHub Actions may block or interfere with WhatsApp API requests in some environments, so WhatsApp notifications are best run locally or from a VPS.
+          </p>
         </section>
 
         <section class="doc-block" id="automation">
@@ -206,6 +209,9 @@ free-steam.json
           <p>
             The workflow runs every 6 hours and can also be triggered manually. It installs dependencies,
             runs both fetcher scripts, regenerates the README, and commits updated JSON snapshots.
+          </p>
+          <p>
+            GitHub Actions remains useful for scraping, state updates, and publishing docs, but WhatsApp delivery is more reliable when run locally or on a VPS.
           </p>
         </section>
 
