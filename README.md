@@ -10,6 +10,28 @@
 ![Discord](https://img.shields.io/badge/Discord-Bot-5865F2?logo=discord&logoColor=white)
 ![WhatsApp](https://img.shields.io/badge/WhatsApp-Cloud%20API-25D366?logo=whatsapp&logoColor=white)
 
+<details>
+<summary><strong>Version</strong></summary>
+
+Current version: **2.7**
+
+Version 2.7 focuses on cleaner test runs, safer JSON state handling, and quieter notifications when old offers expire.
+
+</details>
+
+<details>
+<summary><strong>Change Log</strong></summary>
+
+### v2.7
+
+- Added `delete_state_json.py` to remove only `free.json` and `free-steam.json` for testing.
+- Added `test_runner.py` to delete saved JSON state first, then run `epic.PY` and `steam.py`.
+- Added manual tester workflow at `.github/workflows/tester.yml`.
+- Updated notification logic so expired or removed offers update JSON silently without sending alerts.
+- Updated README and site docs with the new testing flow, workflow tree, and state behavior.
+
+</details>
+
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
@@ -38,6 +60,8 @@ Source: Epic fallback from saved state, Steam live data
 - **Discord bot notifications with rich embeds** (title, image, dates, store link)
 - **WhatsApp Cloud API notifications** with summary and per-game text messages
 - Change detection to avoid duplicate notifications
+- Expired or removed offers update JSON state silently without sending notifications
+- Test runner for clearing JSON state and running both notifiers on demand
 - Automatic README refresh on every scheduled workflow run
 - GitHub Actions automation every 6 hours
 
@@ -50,7 +74,10 @@ free-games-notifier/
 |-- epic.PY
 |-- steam.py
 |-- start.py
+|-- test_runner.py
+|-- delete_state_json.py
 |-- generate_readme.py
+|-- whatsapp.py
 |-- config.json
 |-- secrets.json
 |-- free.json
@@ -62,7 +89,8 @@ free-games-notifier/
 |   `-- site.js
 `-- .github/
     `-- workflows/
-        `-- main.yml
+        |-- main.yml
+        `-- tester.yml
 ```
 
 ---
@@ -172,14 +200,16 @@ Email, Telegram, Discord, and WhatsApp all support multiple targets separated by
 2. Extracts current and upcoming free games.
 3. Formats dates in IST.
 4. Compares the latest JSON snapshot with `free.json`.
-5. Sends email, Telegram, Discord, and/or WhatsApp alerts only when the lineup changes.
+5. Sends email, Telegram, Discord, and/or WhatsApp alerts only when new offers appear.
+6. Saves removed or expired offers to `free.json` silently without sending alerts.
 
 ### `steam.py`
 
 1. Scrapes Steam search results for discounted free offers.
 2. Checks Steam featured categories for free weekend events.
 3. Compares the latest JSON snapshot with `free-steam.json`.
-4. Sends email, Telegram, Discord, and/or WhatsApp alerts only when the lineup changes.
+4. Sends email, Telegram, Discord, and/or WhatsApp alerts only when new offers appear.
+5. Saves removed or expired offers to `free-steam.json` silently without sending alerts.
 
 #### Discord notifications
 
@@ -213,13 +243,19 @@ GitHub Actions may have WhatsApp API requests blocked or fail unpredictably in s
 2. Rebuilds the auto-managed section at the top of this README.
 3. Falls back to saved state files if a live fetch fails.
 
+### Testing helpers
+
+- `delete_state_json.py` removes only `free.json` and `free-steam.json`.
+- `test_runner.py` runs `delete_state_json.py`, then `epic.PY`, then `steam.py`.
+- These helpers are for testing reset behavior. A deleted JSON file means there is no previous state to compare against, so current offers may be treated as new.
+
 ---
 
 ## GitHub Actions Workflow
 
 Note: GitHub Actions is fine for scraping and README refreshes, but WhatsApp API delivery may be blocked there. Use WhatsApp notifications locally or on a VPS for more reliable sending.
 
-The workflow runs on:
+The main workflow `.github/workflows/main.yml` runs on:
 
 - Schedule: every 6 hours with `0 */6 * * *`
 - Manual trigger: `workflow_dispatch`
@@ -232,6 +268,8 @@ Each run:
 4. Runs `generate_readme.py`.
 5. Commits updated state files and `README.md` if anything changed.
 
+The tester workflow `.github/workflows/tester.yml` is manual only. It clears `free.json` and `free-steam.json` first, then runs the Epic and Steam notifiers and refreshes the README. Use it only when you intentionally want a clean test run.
+
 ---
 
 ## Run Manually
@@ -240,6 +278,12 @@ Run both notifier scripts with one command:
 
 ```powershell
 python start.py
+```
+
+Run the testing flow that clears JSON state first:
+
+```powershell
+python test_runner.py
 ```
 
 If you want to run with custom environment variables locally:

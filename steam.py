@@ -277,6 +277,26 @@ def has_changed(signature):
     return load_saved_state().get("signature") != signature
 
 
+def game_key(game):
+    return (
+        game.get("type", "").strip().lower(),
+        game.get("title", "").strip().lower(),
+        game.get("link", "").strip().lower(),
+    )
+
+
+def state_offer_keys(state):
+    return {game_key(game) for game in state.get("games", []) or []}
+
+
+def fetched_offer_keys(games):
+    return {game_key(game) for game in games}
+
+
+def has_new_offers(saved_state, games):
+    return bool(fetched_offer_keys(games) - state_offer_keys(saved_state))
+
+
 def save_state(signature, games):
     state = {
         "signature": signature,
@@ -544,9 +564,13 @@ def send_whatsapp_notifications(games):
 if __name__ == "__main__":
     games = fetch_games()
     signature = generate_signature(games)
+    saved_state = load_saved_state()
 
-    if not has_changed(signature):
+    if saved_state.get("signature") == signature:
         print("No Steam changes.")
+    elif not has_new_offers(saved_state, games):
+        save_state(signature, games)
+        print("Steam offers were removed or expired. JSON state saved without notifications.")
     else:
         print("New Steam update detected.")
         subject = "Steam Free Games Update"

@@ -256,6 +256,32 @@ def has_changed(signature):
     return load_saved_state().get("signature") != signature
 
 
+def game_key(game):
+    return (game.get("title", "").strip().lower(), game.get("link", "").strip().lower())
+
+
+def state_offer_keys(state):
+    keys = set()
+    for game in state.get("current_games", []) or []:
+        keys.add(("current",) + game_key(game))
+    for game in state.get("upcoming_games", []) or []:
+        keys.add(("upcoming",) + game_key(game))
+    return keys
+
+
+def fetched_offer_keys(current_games, upcoming_games):
+    keys = set()
+    for game in current_games:
+        keys.add(("current",) + game_key(game))
+    for game in upcoming_games:
+        keys.add(("upcoming",) + game_key(game))
+    return keys
+
+
+def has_new_offers(saved_state, current_games, upcoming_games):
+    return bool(fetched_offer_keys(current_games, upcoming_games) - state_offer_keys(saved_state))
+
+
 def save_state(signature, current_games, upcoming_games):
     state = {
         "signature": signature,
@@ -569,9 +595,13 @@ def send_whatsapp_notifications(current_games, upcoming_games):
 if __name__ == "__main__":
     current_games, upcoming_games = fetch_games()
     signature = generate_signature(current_games, upcoming_games)
+    saved_state = load_saved_state()
 
-    if not has_changed(signature):
+    if saved_state.get("signature") == signature:
         print("No changes. Email not sent.")
+    elif not has_new_offers(saved_state, current_games, upcoming_games):
+        save_state(signature, current_games, upcoming_games)
+        print("Epic offers were removed or expired. JSON state saved without notifications.")
     else:
         print("New Epic update detected. Sending notifications...")
         current_titles = ", ".join(game["title"] for game in current_games) or "None"

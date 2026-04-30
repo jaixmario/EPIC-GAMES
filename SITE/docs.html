@@ -41,7 +41,7 @@
         <p class="eyebrow">A to Z Guide</p>
         <h1>How this project works, from data collection to GitHub Pages.</h1>
         <p class="hero-text">
-          This page documents the project architecture, scripts, workflow, data files, and deployment path
+          This page documents the project architecture, scripts, workflows, data files, testing helpers, and deployment path
           so anyone opening the repository can understand the full system quickly.
         </p>
       </div>
@@ -67,7 +67,7 @@
           <h2>What this project does</h2>
           <p>
             The project tracks free game promotions from Epic Games and Steam, stores structured JSON snapshots,
-            sends notifications through email, Telegram, Discord, and WhatsApp when lineups change, updates the README automatically, and exposes the latest
+            sends notifications through email, Telegram, Discord, and WhatsApp when new offers appear, updates the README automatically, and exposes the latest
             offers through this GitHub Pages site.
           </p>
         </section>
@@ -86,11 +86,11 @@
             </div>
             <div class="timeline-item">
               <strong>3. Detect changes</strong>
-              <p>A signature is built from the offer list so notifications only send when the lineup actually changes.</p>
+              <p>A signature is built from the offer list, then the scripts check whether any fetched offer is new compared with the saved JSON state.</p>
             </div>
             <div class="timeline-item">
               <strong>4. Persist</strong>
-              <p>The latest state is saved into `free.json` and `free-steam.json` for downstream consumers.</p>
+              <p>The latest state is saved into `free.json` and `free-steam.json`; expired or removed offers update state silently without sending notifications.</p>
             </div>
             <div class="timeline-item">
               <strong>5. Notify</strong>
@@ -98,7 +98,7 @@
             </div>
             <div class="timeline-item">
               <strong>6. Publish</strong>
-              <p>`generate_readme.py` refreshes the README while GitHub Pages serves the JSON-backed website, and `start.py` runs both notifiers locally in sequence.</p>
+              <p>`generate_readme.py` refreshes the README while GitHub Pages serves the JSON-backed website, `start.py` runs normal local checks, and `test_runner.py` runs a clean-state test.</p>
             </div>
           </div>
         </section>
@@ -110,6 +110,8 @@
             <div class="info-row"><span>`epic.PY`</span><strong>Epic fetcher, multi-channel notifier, JSON state writer.</strong></div>
             <div class="info-row"><span>`steam.py`</span><strong>Steam fetcher, weekend title resolver, multi-channel notifier.</strong></div>
             <div class="info-row"><span>`start.py`</span><strong>Runs `epic.PY` and `steam.py` one after another.</strong></div>
+            <div class="info-row"><span>`test_runner.py`</span><strong>Runs `delete_state_json.py`, then `epic.PY`, then `steam.py` for clean-state testing.</strong></div>
+            <div class="info-row"><span>`delete_state_json.py`</span><strong>Deletes only `free.json` and `free-steam.json` for test resets.</strong></div>
             <div class="info-row"><span>`generate_readme.py`</span><strong>README auto-section generator.</strong></div>
             <div class="info-row"><span>`whatsapp.py`</span><strong>Shared WhatsApp Cloud API helper for text and image messages.</strong></div>
             <div class="info-row"><span>`config.json`</span><strong>Notification toggles and secrets-file settings.</strong></div>
@@ -118,6 +120,8 @@
             <div class="info-row"><span>`free-steam.json`</span><strong>Steam free-offer snapshot.</strong></div>
             <div class="info-row"><span>`index.html`</span><strong>GitHub Pages homepage for the games dashboard.</strong></div>
             <div class="info-row"><span>`SITE/docs.html`</span><strong>Full documentation page.</strong></div>
+            <div class="info-row"><span>`.github/workflows/main.yml`</span><strong>Scheduled and manual production notifier workflow.</strong></div>
+            <div class="info-row"><span>`.github/workflows/tester.yml`</span><strong>Manual test workflow that clears JSON state before running notifiers.</strong></div>
           </div>
         </section>
 
@@ -141,6 +145,9 @@ free-steam.json
   "games": [{ "type": "", "title": "", "link": "", "image": "", "time": "" }]
 }</code></pre>
           </div>
+          <p>
+            If an offer expires or disappears, the notifier saves the new JSON state without sending alerts. Alerts are sent only when at least one fetched offer is new compared with the saved snapshot.
+          </p>
         </section>
 
         <section class="doc-block" id="notifications">
@@ -207,8 +214,11 @@ free-steam.json
           <p class="eyebrow">Automation</p>
           <h2>GitHub Actions</h2>
           <p>
-            The workflow runs every 6 hours and can also be triggered manually. It installs dependencies,
+            The main workflow runs every 6 hours and can also be triggered manually. It installs dependencies,
             runs both fetcher scripts, regenerates the README, and commits updated JSON snapshots.
+          </p>
+          <p>
+            The tester workflow is manual only. It runs <code>delete_state_json.py</code> first, then runs the Epic and Steam notifiers. Use it when you intentionally want to test behavior from a clean JSON state.
           </p>
           <p>
             GitHub Actions remains useful for scraping, state updates, and publishing docs, but WhatsApp delivery is more reliable when run locally or on a VPS.
@@ -237,11 +247,13 @@ $env:WHATSAPP_TO="919999999999"
 $env:WHATSAPP_API_VERSION="v25.0"
 
 python start.py
+python test_runner.py
 python generate_readme.py</code></pre>
           </div>
           <p>
             For local runs, you can either set environment variables like the example above or keep
             <code>use_hardcoded_secrets</code> enabled and place the same values in <code>secrets.json</code>.
+            Use <code>start.py</code> for a normal run and <code>test_runner.py</code> only when you want to delete saved JSON state first.
           </p>
         </section>
 
