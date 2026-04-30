@@ -1,4 +1,4 @@
-name: Free Games Auto Notifier
+name: Free Games Auto Notifier [TESTER]
 
 on:
   workflow_dispatch:
