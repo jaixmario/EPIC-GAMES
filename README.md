@@ -316,7 +316,9 @@ python generate_readme.py
 - State files are JSON snapshots containing signatures plus game metadata like title, link, image, dates, and offer type.
 
 ---
-
+<p align="left">
+  <img src="https://komarev.com/ghpvc/?username=jaixmario&label=Profile%20views&color=0e75b6&style=flat" alt="jaixmario" />
+</p>
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
