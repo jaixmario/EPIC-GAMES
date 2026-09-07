@@ -35,7 +35,7 @@ Version 2.7 focuses on cleaner test runs, safer JSON state handling, and quieter
 <!-- README_AUTO_SECTION:START -->
 ## Free Games Right Now
 
-Last updated: **07 Sep 2026, 10:41 PM IST**  
+Last updated: **08 Sep 2026, 02:34 AM IST**  
 Source: Epic fallback from saved state, Steam live data
 
 ### Epic Games
