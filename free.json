@@ -1,16 +1,7 @@
 {
-  "signature": "CURRENT:Alone With You|UPCOMING:Astral Ascent,Luftrausers",
-  "updated_at": "2026-09-03T15:44:42.025853+00:00",
+  "signature": "CURRENT:Astral Ascent,Luftrausers|UPCOMING:Mindcop,Shogun Showdown",
+  "updated_at": "2026-09-10T15:47:36.132486+00:00",
   "current_games": [
-    {
-      "title": "Alone With You",
-      "image": "https://cdn1.epicgames.com/spt-assets/04b7a1d78c904065b5c24f9e7816c99a/alone-with-you-cllc3.png",
-      "link": "https://store.epicgames.com/en-US/p/alone-with-you-028a15",
-      "start": "03 Sep 2026, 08:30 PM IST",
-      "end": "10 Sep 2026, 08:30 PM IST"
-    }
-  ],
-  "upcoming_games": [
     {
       "title": "Astral Ascent",
       "image": "https://cdn1.epicgames.com/spt-assets/974c8a587d714d8d9e0c3b0fefe61a35/astral-ascent-b0gcm.png",
@@ -24,6 +15,22 @@
       "link": "https://store.epicgames.com/en-US/p/luftrausers-51e5e9",
       "start": "10 Sep 2026, 08:30 PM IST",
       "end": "17 Sep 2026, 08:30 PM IST"
+    }
+  ],
+  "upcoming_games": [
+    {
+      "title": "Mindcop",
+      "image": "https://cdn1.epicgames.com/spt-assets/984cdc148ea6423e866ca6e04a1b429f/mindcop-kplp1.jpg",
+      "link": "https://store.epicgames.com/en-US/p/mindcop-78e6c1",
+      "start": "17 Sep 2026, 08:30 PM IST",
+      "end": "24 Sep 2026, 08:30 PM IST"
+    },
+    {
+      "title": "Shogun Showdown",
+      "image": "https://cdn1.epicgames.com/spt-assets/450bcfdb9c00453394d7ccc2948ba5db/shogun-showdown-hz1yh.jpg",
+      "link": "https://store.epicgames.com/en-US/p/shogun-showdown-61832d",
+      "start": "17 Sep 2026, 08:30 PM IST",
+      "end": "24 Sep 2026, 08:30 PM IST"
     }
   ]
 }
